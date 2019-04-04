@@ -92,7 +92,7 @@ def download_search(results):
         img_fname = IMG_FNAME % (meta['query'], photo['id'], meta['query'])
         img_fname_s = IMG_FNAME_S % (meta['query'], photo['id'], meta['query'])
         save_image(img_url, img_fname)
-        save_image(img_url_s, img_fname_s)
+        #save_image(img_url_s, img_fname_s)
     with open(DATA_FNAME % meta['query'], 'w') as f:
         json.dump(photos_data, f)
 

@@ -108,32 +108,48 @@ def download_searches(filenames):
 def search(query='pain'):
     if not os.path.isdir(SEARCHES_DIR):
         os.makedirs(SEARCHES_DIR)
-    params = {'api_key': API_KEY,
+    page = 1
+    num_pages = 100
+
+    all_data = {}
+    while page <= num_pages:
+        params = {'api_key': API_KEY,
               'safe_search': '1',  # safest
               'media': 'photos',  # just photos
               'content_type': '1',  # just photos
               'privacy_filter': '1',  # public photos
-              'license': '1,2,4,5',  # see README.md
+              'license': '10',  # see README.md
               'per_page': '500',  # max=500
               'sort': 'relevance',
               'method': 'flickr.photos.search',
-              'format': 'json'}
-    query_dict = {'text': query}
-    clean_query = query.replace(' ', '-')
-    fname = './search/search.%s.%s.json' % (clean_query, YMD)
-    response = requests.get(REST_ENDPOINT,
+              'format': 'json',
+              'page': str(page)}
+        query_dict = {'text': query}
+        clean_query = query.replace(' ', '-')
+        fname = './search/search.%s.%s.json' % (clean_query, YMD)
+        response = requests.get(REST_ENDPOINT,
                             params=dict(params, **query_dict))
-    with open(fname, 'w') as f:
+
         data = json.loads(unjsonpify(response.text))
-        data[TAG] = {}
-        data[TAG]['query'] = clean_query
-        data[TAG]['when'] = YMD
-        f.write(json.dumps(data))
+        if len(all_data) == 0:
+            all_data = dict(data)
+        else:
+            all_data['photos']['photo'] += data['photos']['photo']
+
+        num_pages = data['photos']['pages']
+        print('Processed {} of {}'.format(page, num_pages))
+        page += 1
+
+    with open(fname, 'w') as f:
+        all_data[TAG] = {}
+        all_data[TAG]['query'] = clean_query
+        all_data[TAG]['when'] = YMD
+        f.write(json.dumps(all_data))
 
 
 def keywords_search(args, keywords):
     for i, keyword in enumerate(keywords):
-        sys.stdout.write('\rrunning keyword search... %d/%d (%s)' %
+        sys.stdout.write('\rrunning keyword search... %d/%d (%s)\n' %
                          (i + 1, len(keywords), keyword))
         sys.stdout.flush()
         search(keyword)

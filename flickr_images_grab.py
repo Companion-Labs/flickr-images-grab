@@ -85,6 +85,9 @@ def download_search(results):
             continue
 
         info = get_photo_info(photo)
+        if 'photo' not in info:
+            continue
+
         photos_data.append(info['photo'])
         img_url = IMG_URL % (photo['farm'],
                              photo['server'],

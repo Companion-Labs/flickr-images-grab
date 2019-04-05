@@ -79,6 +79,11 @@ def download_search(results):
                           len(results['photos']['photo']),
                           meta['query']))
         sys.stdout.flush()
+        img_fname = IMG_FNAME % (meta['query'], photo['id'], meta['query'])
+        img_fname_s = IMG_FNAME_S % (meta['query'], photo['id'], meta['query'])
+        if os.path.exists(img_fname):
+            continue
+
         info = get_photo_info(photo)
         photos_data.append(info['photo'])
         img_url = IMG_URL % (photo['farm'],
@@ -89,8 +94,6 @@ def download_search(results):
                                  photo['server'],
                                  photo['id'],
                                  photo['secret'])
-        img_fname = IMG_FNAME % (meta['query'], photo['id'], meta['query'])
-        img_fname_s = IMG_FNAME_S % (meta['query'], photo['id'], meta['query'])
         save_image(img_url, img_fname)
         #save_image(img_url_s, img_fname_s)
     with open(DATA_FNAME % meta['query'], 'w') as f:

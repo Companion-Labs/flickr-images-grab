@@ -84,7 +84,12 @@ def download_search(results):
         if os.path.exists(img_fname):
             continue
 
-        info = get_photo_info(photo)
+        try:
+            info = get_photo_info(photo)
+        except e:
+            print(e)
+            continue
+
         if 'photo' not in info:
             continue
 
